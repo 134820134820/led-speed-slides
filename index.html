@@ -21,13 +21,14 @@
 <div class="stage"><img id="slide" alt="Slide 1" src="slides/1.png"></div>
 <div class="hud">
   <button type="button" id="prev" aria-label="Previous slide">‹</button>
-  <span id="count">1 / 6</span>
+  <span id="count">1 / 14</span>
   <button type="button" id="next" aria-label="Next slide">›</button>
   <button type="button" id="full">Full screen</button>
 </div>
 <script>
-// Six image slides, identical to the submitted PPT. Keys: arrows, space, PageUp/Down (clickers), F for full screen.
-const N = 6, img = document.getElementById("slide"), count = document.getElementById("count");
+// 6 submitted slides, then the Q&A index (7) and backups B1–B7 (8–14). Keys: arrows, space, PageUp/Down (clickers),
+// F for full screen, or type a page number and press Enter to jump (e.g. 8 Enter).
+const N = 14, img = document.getElementById("slide"), count = document.getElementById("count");
 for (let i = 2; i <= N; i++) new Image().src = `slides/${i}.png`;      // preload
 let cur = Math.min(N, Math.max(1, parseInt(location.hash.slice(1)) || 1));
 function show(i) {
@@ -40,7 +41,10 @@ const fullscreen = () => document.fullscreenElement ? document.exitFullscreen() 
 document.getElementById("prev").onclick = () => show(cur - 1);
 document.getElementById("next").onclick = () => show(cur + 1);
 document.getElementById("full").onclick = fullscreen;
+let buf = "", bufT;
 document.addEventListener("keydown", e => {
+  if (/^[0-9]$/.test(e.key)) { buf += e.key; count.textContent = `→ ${buf}`; clearTimeout(bufT); bufT = setTimeout(() => { buf = ""; show(cur); }, 2000); return; }
+  if (e.key === "Enter" && buf) { e.preventDefault(); const k = +buf; buf = ""; show(k); return; }
   if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); show(cur + 1); }
   else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); show(cur - 1); }
   else if (e.key === "Home") show(1);
